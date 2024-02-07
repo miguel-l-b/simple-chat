@@ -34,6 +34,13 @@ export default function Home() {
         {
           id: "1",
           type: "text",
+          content: "Você tem algum compromisso amanhã?",
+          author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
+          date: new Date("2024-02-07T18:46:00"),
+          read: false
+        },        {
+          id: "1",
+          type: "text",
           content: "Também estou bem, obrigado por perguntar!",
           author: { id: "123", name: "Alice", avatar: "https://i.imgur.com/gSUHQQx.jpeg" },
           date: new Date("2024-02-07T15:46:00"),
