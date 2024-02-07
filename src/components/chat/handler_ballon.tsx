@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { ChatBallon, ChatCardTime } from "."
+import { ChatBalloon, ChatCardTime } from "."
 import TMessage from "../../utils/types/message"
 
 export interface ChatHandlerBallonProps {
@@ -40,7 +40,8 @@ export default function HandlerBallon({ content, user_id, className }: ChatHandl
               <ChatCardTime now={clock} date={messages[0].date} className="m-auto mt-8 mb-5" />
               {
                 messages.map(message => (
-                  <ChatBallon
+                  <>
+                  <ChatBalloon
                     key={message.id}
                     direction={
                       user_id !== message.author.id ? 
@@ -53,10 +54,13 @@ export default function HandlerBallon({ content, user_id, className }: ChatHandl
                         m.author.id === message.author.id
                       ).pop() === message
                     }
+                    avatar={message.author.avatar}
+                    author={message.author.name}
                     read={message.read}
                   >
                     {message.content}
-                  </ChatBallon>
+                  </ChatBalloon>
+                  </>
                 ))
               }
             </div>
