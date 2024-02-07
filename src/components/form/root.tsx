@@ -5,7 +5,7 @@ export interface FormRootProps extends React.HTMLAttributes<HTMLFormElement> {
 
 export default function Root({children, ...props}: FormRootProps) {
   return (
-    <form {...props}>
+    <form onSubmit={(e) => e.preventDefault()} {...props}>
       {children}
     </form>
   );
