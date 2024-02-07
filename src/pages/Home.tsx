@@ -36,7 +36,15 @@ export default function Home() {
           type: "text",
           content: "Também estou bem, obrigado por perguntar!",
           author: { id: "123", name: "Alice", avatar: "https://i.imgur.com/gSUHQQx.jpeg" },
-          date: new Date("2024-02-06T15:46:00"),
+          date: new Date("2024-02-07T15:46:00"),
+          read: true
+        },
+        {
+          id: "2",
+          type: "text",
+          content: "Eaí mana!",
+          author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
+          date: new Date("2024-02-07T15:44:34"),
           read: true
         },
         {
@@ -44,7 +52,7 @@ export default function Home() {
           type: "text",
           content: "Estou bem, e você?",
           author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
-          date: new Date("2024-02-06T15:45:00"),
+          date: new Date("2024-02-07T15:45:00"),
           read: true
         },
         {
