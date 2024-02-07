@@ -71,6 +71,7 @@ export default function Register() {
               })
           }}
           incorrect={isIncorrect("username")}
+          autoComplete="username"
         />
         <FormInput
           label="Email"
@@ -87,6 +88,7 @@ export default function Register() {
               })
           }}
           incorrect={isIncorrect("email")}
+          autoComplete="email"
         />
         <FormInput
           label="Senha"
@@ -103,6 +105,7 @@ export default function Register() {
               })
           }}
           incorrect={isIncorrect("password")}
+          autoComplete="new-password"
         />
         <FormInput
           label="Confirmar Senha"
@@ -119,6 +122,7 @@ export default function Register() {
               })
           }}
           incorrect={isIncorrect("confirmPassword")}
+          autoComplete="new-password"
         />
       </main>
       <footer className="flex flex-col text-center gap-5">

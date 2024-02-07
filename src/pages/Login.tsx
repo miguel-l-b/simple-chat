@@ -82,11 +82,14 @@ export default function Login() {
               })
           }}
           incorrect={isIncorrect("email")}
+          autoComplete="email"
         />
         <FormInput
           label="Senha"
           type="password"
           onChange={(e) => pushInput("password", e.target.value)}
+          incorrect={isIncorrect("password")}
+          autoComplete="current-password"
         />
       </main>
       <footer className="flex flex-col text-center gap-5">
