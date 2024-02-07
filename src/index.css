@@ -20,7 +20,6 @@ menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
 	margin: 0;
 	padding: 0;
-	border: 0;
 	font-size: 100%;
 	font: inherit;
 	vertical-align: baseline;
@@ -62,6 +61,34 @@ body {
   @apply bg-white text-gray-900 font-jura;
 }
 
+h1 {
+  @apply text-4xl font-bold;
+}
+
+h2 {
+  @apply text-3xl font-bold;
+}
+
+h3 {
+  @apply text-2xl font-bold;
+}
+
+h4 {
+  @apply text-xl font-bold;
+}
+
+h5 {
+  @apply text-lg font-bold;
+}
+
+h6 {
+  @apply text-base font-bold;
+}
+
+p {
+  @apply text-base;
+}
+
 a #animated {
   position: relative;
   color: #fff;
@@ -89,4 +116,9 @@ a:hover #animated:before {
   visibility: visible;
   -webkit-transform: scaleX(1);
   transform: scaleX(1);
+}
+
+.emoji {
+  vertical-align: middle;
+  @apply inline-block h-[1em] w-[1em];
 }
