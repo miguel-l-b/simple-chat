@@ -31,35 +31,39 @@ export default function HandlerBallon({ content, user_id, className }: ChatHandl
   }, [])
 
 
+  function isFinalMessage(currentIndex: number, messages: Array<TMessage>) {
+    if(messages.length - 1 === currentIndex)
+      return true
+    if(messages[currentIndex].author.id !== messages[currentIndex + 1].author.id)
+      return true
+    return false
+  }
+
   return (
     <>
       <div className={`flex flex-col gap-4 ${className}`}>
         {
-          groupedMessagesOfDate.map((messages, index) => (
+          groupedMessagesOfDate.flatMap((messages, index) => (
             <div key={index} className="flex flex-col gap-2">
               <ChatCardTime now={clock} date={messages[0].date} className="m-auto mt-8 mb-5" />
               {
-                messages.map(message => (
+                messages.map((message, index) => (
                   <>
-                  <ChatBalloon
-                    key={message.id}
-                    direction={
-                      user_id !== message.author.id ? 
-                        "left" 
-                      : 
-                        "right"
-                    }
-                    isFinal={
-                      messages.filter(m => 
-                        m.author.id === message.author.id
-                      ).pop() === message
-                    }
-                    avatar={message.author.avatar}
-                    author={message.author.name}
-                    read={message.read}
-                  >
-                    {message.content}
-                  </ChatBalloon>
+                    <ChatBalloon
+                      key={message.id}
+                      isFinal={isFinalMessage(index, messages)}
+                      direction={
+                        user_id !== message.author.id ? 
+                          "left" 
+                        : 
+                          "right"
+                      }
+                      avatar={message.author.avatar}
+                      author={message.author.name}
+                      read={message.read}
+                    >
+                      {message.content}
+                    </ChatBalloon>
                   </>
                 ))
               }
