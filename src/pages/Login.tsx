@@ -1,14 +1,15 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Form, { FormAlert, FormButton, FormInput } from "../components/form"
 
 import { IoChatbubble } from 'react-icons/io5'
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import ErrorAlert from "../utils/types/error"
 import EmailValidator from "../utils/validations/email"
 
 
 
 export default function Login() {
+  const redirect = useNavigate()
   const [inputs, setInputs] = useState<Record<string, string>>({
     email: "",
     password: ""
@@ -59,10 +60,11 @@ export default function Login() {
         <IoChatbubble 
           className={`
             m-auto text-6xl
-            text-blue-200 transition-transform duration-300
+            text-blue-200 transition-all duration-300
           `}
           style={{
-            transform: `rotate(-${inputs.password.length}deg)`
+            transform: `rotate(-${inputs.password.length}deg)`,
+            scale: inputs.password.length > 0? "120%" : "100%"
           }}
         />
       </Link>
@@ -82,13 +84,25 @@ export default function Login() {
               })
           }}
           incorrect={isIncorrect("email")}
+          value={inputs.email}
           autoComplete="email"
         />
         <FormInput
           label="Senha"
           type="password"
-          onChange={(e) => pushInput("password", e.target.value)}
+          onChange={(e) => {
+            pushInput("password", e.target.value)
+            e.target.value.length > 0?
+              cleanError("password")
+            :
+              pushError({
+                id: "password",
+                type: "error",
+                message: "A senha é obrigatória!"
+              })
+          }}
           incorrect={isIncorrect("password")}
+          value={inputs.password}
           autoComplete="current-password"
         />
       </main>
@@ -97,7 +111,9 @@ export default function Login() {
           errors.find(e => e.type !== "success") &&
           <FormAlert type={errors[0].type} description={errors[0].message} />
         }
-        <FormButton>Entrar</FormButton>
+        <FormButton onClick={() => {
+          redirect("/chat")
+        }}>Entrar</FormButton>
         <Link to="/register">
           Não tenho uma conta,
           <span id="animated"> criar conta!</span>

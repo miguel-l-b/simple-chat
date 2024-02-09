@@ -19,7 +19,7 @@ export default function CardTime({date, now, className}: ChatCardTimeProps) {
       `Hoje`
   
   return (
-    <div className={`min-w-28 w-fit px-3 rounded-lg bg-gray-800 text-white ${className}`}>
+    <div className={`min-w-28 w-fit px-3 rounded-lg bg-gray-800 text-white text-center ${className}`}>
       <p>{message}</p>
     </div>
   )

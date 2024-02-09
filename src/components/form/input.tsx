@@ -13,7 +13,7 @@ export default function Input({label, ...props}: InputProps) {
       <label className="mb-2 text-xl font-bold">{label}</label>
       <div className="relative flex h-8">
         <input
-          className="w-full px-3 rounded-lg"
+          className="w-full px-3 rounded-lg outline-none focus:ring-2"
           {...props}
           onChange={(e) => {
             if (props.onChange) {

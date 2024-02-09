@@ -4,8 +4,11 @@ export interface HeaderRootProps extends React.HTMLAttributes<HTMLElement> {
 
 export default function HeaderRoot({children, className, ...props}: HeaderRootProps) {
   return (
-    <header className={`flex gap-10 items-center ${className}`} {...props}>
+    <>
+    <header className={`fixed flex gap-10 items-center w-full z-50 ${className}`} {...props}>
       {children}
     </header>
+    <span className="block h-20 w-full" />
+    </>
   )
 }

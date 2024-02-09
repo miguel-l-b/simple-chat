@@ -10,6 +10,7 @@ export interface ChatHandlerBallonProps {
 
 export default function HandlerBallon({ content, user_id, className }: ChatHandlerBallonProps) {
   const [clock, setClock] = useState(new Date())
+
   content = content.sort((a, b) => a.date.getTime() - b.date.getTime())
   const groupedMessagesOfDate = Object.values(
     content.reduce((acc, message) => {
@@ -44,7 +45,7 @@ export default function HandlerBallon({ content, user_id, className }: ChatHandl
       <div className={`flex flex-col gap-4 ${className}`}>
         {
           groupedMessagesOfDate.flatMap((messages, index) => (
-            <div key={index} className="flex flex-col gap-2">
+            <div key={index} className="flex flex-col px-14">
               <ChatCardTime now={clock} date={messages[0].date} className="m-auto mt-8 mb-5" />
               {
                 messages.map((message, index) => (
@@ -52,6 +53,7 @@ export default function HandlerBallon({ content, user_id, className }: ChatHandl
                     <ChatBalloon
                       key={message.id}
                       isFinal={isFinalMessage(index, messages)}
+                      date={message.createAt}
                       direction={
                         user_id !== message.author.id ? 
                           "left" 
@@ -64,6 +66,9 @@ export default function HandlerBallon({ content, user_id, className }: ChatHandl
                     >
                       {message.content}
                     </ChatBalloon>
+                    {
+                      isFinalMessage(index, messages) && <span className="block h-5 w-full" />
+                    }
                   </>
                 ))
               }

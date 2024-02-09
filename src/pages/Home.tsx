@@ -1,14 +1,16 @@
+import { useRef } from "react"
 import { Link } from "react-router-dom"
 import Header, { HeaderButton } from "../components/header"
 import Chat, { ChatButton, ChatInput } from "../components/chat"
 
 export default function Home() {
+  const refAbout = useRef<HTMLDivElement>(null)
   return (
     <>
-    <Header className="p-5">
+    <Header className="p-5 bg-white">
       <img className="w-12" src="logo.svg" alt="logo do site" />
       <nav className="flex gap-8 items-center justify-between w-full h-fit">
-        <HeaderButton to="#about">Sobre</HeaderButton>
+        <HeaderButton to={refAbout}>Sobre</HeaderButton>
         <div className="flex gap-2 px-8">
           <HeaderButton to="/login" className="hover:underline">Login</HeaderButton>
           /
@@ -26,7 +28,7 @@ export default function Home() {
         Para começar, faça o 
         <Link to="/login"><span id="animated"> login </span></Link>
         ou
-        <Link to="/login"><span id="animated"> crie uma conta</span></Link>
+        <Link to="/register"><span id="animated"> crie uma conta</span></Link>
       </p>
       <br />
       <section id="exemple">
@@ -34,14 +36,14 @@ export default function Home() {
         {
           id: "1",
           type: "text",
-          content: "Você tem algum compromisso amanhã?",
+          content: "Você tem algum compromisso amanhã? 🧐",
           author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
           date: new Date("2024-02-07T18:46:00"),
           read: false
         },        {
           id: "1",
           type: "text",
-          content: "Também estou bem, obrigado por perguntar!",
+          content: "Também estou bem, obrigado por perguntar! ✌️",
           author: { id: "123", name: "Alice", avatar: "https://i.imgur.com/gSUHQQx.jpeg" },
           date: new Date("2024-02-07T15:46:00"),
           read: true
@@ -82,7 +84,7 @@ export default function Home() {
       </div>
     </section>
     </main>
-    <section className="flex flex-col items-center justify-center text-center mt-56 w-full h-dvh bg-slate-300" id="about">
+    <section ref={refAbout} className="flex flex-col items-center justify-center text-center mt-56 w-full h-dvh bg-slate-300" id="about">
       <h1 className="mb-20">Principais Recursos</h1>
       <h2>Chat em Tempo Real</h2>
       <p>Converse com amigos, familiares e colegas instantaneamente, sem atrasos.</p>
