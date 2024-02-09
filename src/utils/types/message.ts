@@ -5,7 +5,7 @@ type TMessage = {
   type: "text";
   content: string;
   author: Omit<TUser, "email">;
-  date: Date;
+  createAt: Date;
   read: boolean;
 }
 
