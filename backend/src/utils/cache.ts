@@ -3,18 +3,53 @@ import TCacheValue from "@/types/cache_value"
 export default class Cache {
   private static cache: Record<string, any> = {}
 
-  static set<T extends TCacheValue>(table: string, value: T) {
-    console.table(this.cache)
-    const key = `${table}:${value.id}`
-    delete value.id
-    this.cache[key] = value
+  private static log() {
+    const data = {}
+
+    for(const key in this.cache) {
+      const [ table, id ] = key.split(":")
+      data[id] = {
+        table,
+        value: JSON.stringify(this.cache[key]).substring(0, 50)+" ...}"
+      }
+    }
+    console.table(data)
   }
 
-  static get<T extends TCacheValue>(table: string, id: string) {
+  static set<T extends TCacheValue>(table: string, value: T) {
+    const key = `${table}:${value.id}`
+    delete value.id
+    this.cache = {
+      ...this.cache,
+      [key]: value
+    }
+    this.log()
+    return {
+      id: key.split(":")[1],
+      ...value
+    } as T
+  }
+
+  static update<T extends TCacheValue>(table: string, id: string, value: Partial<T>) {
     const key = `${table}:${id}`
+    if(!this.cache[key]) return null
+    this.cache[key] = {
+      ...this.cache[key],
+      ...value
+    }
+    this.log()
     return {
       id,
       ...this.cache[key]
+    } as T
+  }
+
+  static get<T extends TCacheValue>(table: string, id: string) {
+    const value = this.cache[`${table}:${id}`]
+    if(!value) return null
+    return {
+      id,
+      ...value
     } as T
   }
 

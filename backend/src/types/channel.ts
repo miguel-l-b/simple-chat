@@ -5,13 +5,13 @@ export type TDirect = {
   isDirect: true
 }
 
-export type TGroup = {
+export interface TGroup {
   isDirect: false
+  name: string
   image: string
 }
 
 type TChannel = {
-  name: string
   members: TUser["id"][]
 } & (TDirect | TGroup) & TCacheValue
 

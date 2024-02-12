@@ -1,10 +1,14 @@
-import { useState } from "react"
+import { useContext } from "react"
 import { IoCheckmarkDone  } from "react-icons/io5"
-import { FiTrash, FiSlash, FiCopy } from "react-icons/fi"
+import { FiTrash, FiCopy } from "react-icons/fi"
+import { BalloonSelectedContext } from "../../context/balloon_selected"
+import { ChatContext } from "../../context/chat"
 
 export interface ChatBallonProps {
   children: React.ReactNode;
+  id: string;
   direction: "left" | "right";
+  channel_id: string;
   date: Date;
   read: boolean;
   avatar?: string;
@@ -12,10 +16,19 @@ export interface ChatBallonProps {
   isFinal?: boolean;
 }
 
-export default function Balloon({direction, date, avatar, author, read, isFinal, children}: ChatBallonProps) {
-  const [isOpened, setIsOpened] = useState(false)
+export default function Balloon({
+  id, channel_id, direction, date, avatar, author, read, isFinal, children
+}: ChatBallonProps) {
+  const { id: selectedId, handleSelect } = useContext(BalloonSelectedContext)
+  const { deleteMessage } = useContext(ChatContext)
+  function handleCopy() {
+    navigator.clipboard.writeText(
+      `"${children!.toString()}" de ${author} - ${date.toLocaleTimeString().substring(0, 5)}`
+    )
+  }
+
   return (
-    <div className="relative w-full px-2.5 select-none" onDoubleClick={() => setIsOpened(!isOpened)}>
+    <div className="relative w-full px-2.5 select-none" onDoubleClick={() => handleSelect(selectedId === id? "" : id)}>
       <div
         className={`
           absolute -top-1 left-0 w-full h-full px-14
@@ -23,19 +36,33 @@ export default function Balloon({direction, date, avatar, author, read, isFinal,
           ${direction === "left" ? "justify-end" : "justify-end flex-row-reverse"}
           transition-all duration-150
           bg-blue-400 bg-opacity-60
-          ${!isOpened && "hidden"}
+          ${selectedId !== id && "hidden"}
         `}
       >
-        <button className="flex flex-col group items-center mt-2 text-slate-600" type="button">
-          <FiTrash  className="text-blue-900 bg-blue-200 group-hover:bg-blue-400 transition-colors duration-150 p-2 rounded-lg w-9 h-9" />
+        <button
+          className="flex flex-col group items-center mt-2 text-slate-600"
+          type="button"
+          onClick={() => deleteMessage(channel_id, id)}
+        >
+          <FiTrash
+            className={`
+              text-blue-900 bg-blue-200 group-hover:bg-blue-400 
+              transition-colors duration-150 p-2 rounded-lg w-9 h-9
+            `} 
+            />
           <p>apagar</p>
         </button>
-        <button className="flex flex-col group items-center mt-2 text-slate-600" type="button">
-          <FiSlash  className="text-blue-900 bg-blue-200 group-hover:bg-blue-400 transition-colors duration-150 p-2 rounded-lg w-9 h-9" />
-          <p>reportar</p>
-        </button>
-        <button className="flex flex-col group items-center mt-2 text-slate-600" type="button">
-          <FiCopy className="text-blue-900 bg-blue-200 group-hover:bg-blue-400 transition-colors duration-150 p-2 rounded-lg w-9 h-9" />
+        <button
+          className="flex flex-col group items-center mt-2 text-slate-600"
+          type="button"
+          onClick={handleCopy}
+        >
+          <FiCopy
+            className={`
+              text-blue-900 bg-blue-200 group-hover:bg-blue-400 
+              transition-colors duration-150 p-2 rounded-lg w-9 h-9
+            `} 
+          />
           <p>copiar</p>
         </button>
       </div>
@@ -77,7 +104,9 @@ export default function Balloon({direction, date, avatar, author, read, isFinal,
           >
             <p>@{author}</p>
             <img className="w-8 rounded-xl" src={avatar} alt={`avatar de ${author}`} />
-            <p className={`${direction === "left"? "-ml-14" : "-mr-14"}`}>{date.toLocaleTimeString().substring(0, 5)}</p>
+            <p className={`${direction === "left"? "-ml-14" : "-mr-14"}`}>
+              {date.toLocaleTimeString().substring(0, 5)}
+            </p>
           </div>
         )
       }

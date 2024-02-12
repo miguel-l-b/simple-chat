@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { ChatBalloon, ChatCardTime } from "."
 import TMessage from "../../utils/types/message"
+import BalloonSelectedProvider from "../../context/balloon_selected"
 
 export interface ChatHandlerBallonProps {
   content: Array<TMessage>,
@@ -11,10 +12,10 @@ export interface ChatHandlerBallonProps {
 export default function HandlerBallon({ content, user_id, className }: ChatHandlerBallonProps) {
   const [clock, setClock] = useState(new Date())
 
-  content = content.sort((a, b) => a.date.getTime() - b.date.getTime())
+  content = content.sort((a, b) => a.createAt.getTime() - b.createAt.getTime())
   const groupedMessagesOfDate = Object.values(
     content.reduce((acc, message) => {
-      const date = message.date.toDateString()
+      const date = message.createAt.toDateString()
       if (acc[date]) {
         acc[date].push(message)
       } else {
@@ -32,7 +33,7 @@ export default function HandlerBallon({ content, user_id, className }: ChatHandl
   }, [])
 
 
-  function isFinalMessage(currentIndex: number, messages: Array<TMessage>) {
+  function isFinalMessage(currentIndex: number, messages: Array<Omit<TMessage, 'channel_id'>>) {
     if(messages.length - 1 === currentIndex)
       return true
     if(messages[currentIndex].author.id !== messages[currentIndex + 1].author.id)
@@ -44,34 +45,38 @@ export default function HandlerBallon({ content, user_id, className }: ChatHandl
     <>
       <div className={`flex flex-col gap-4 ${className}`}>
         {
-          groupedMessagesOfDate.flatMap((messages, index) => (
-            <div key={index} className="flex flex-col px-14">
-              <ChatCardTime now={clock} date={messages[0].date} className="m-auto mt-8 mb-5" />
-              {
-                messages.map((message, index) => (
-                  <>
-                    <ChatBalloon
-                      key={message.id}
-                      isFinal={isFinalMessage(index, messages)}
-                      date={message.createAt}
-                      direction={
-                        user_id !== message.author.id ? 
-                          "left" 
-                        : 
-                          "right"
+          groupedMessagesOfDate.map((messages, key) => (
+            <div key={key} className="flex flex-col px-14">
+              <ChatCardTime now={clock} date={messages[0].createAt} className="m-auto mt-8 mb-5" />
+              <BalloonSelectedProvider>
+                {
+                  messages.map((message, index) => (
+                    <>
+                      <ChatBalloon
+                        key={message.id}
+                        id={message.id}
+                        channel_id={message.channel_id}
+                        isFinal={isFinalMessage(index, messages)}
+                        date={message.createAt}
+                        direction={
+                          user_id !== message.author.id ? 
+                            "left" 
+                          : 
+                            "right"
+                        }
+                        avatar={message.author.avatar}
+                        author={message.author.name}
+                        read={message.read}
+                      >
+                        {message.content}
+                      </ChatBalloon>
+                      {
+                        isFinalMessage(index, messages) && <span className="block h-5 w-full" />
                       }
-                      avatar={message.author.avatar}
-                      author={message.author.name}
-                      read={message.read}
-                    >
-                      {message.content}
-                    </ChatBalloon>
-                    {
-                      isFinalMessage(index, messages) && <span className="block h-5 w-full" />
-                    }
-                  </>
-                ))
-              }
+                    </>
+                  ))
+                }
+              </BalloonSelectedProvider>
             </div>
           ))
         }

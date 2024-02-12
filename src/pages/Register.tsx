@@ -1,15 +1,23 @@
-import { IoChatbubble } from "react-icons/io5";
-import { Link } from "react-router-dom";
-import Form, { FormAlert, FormButton, FormInput } from "../components/form";
-import { useState } from "react";
-import ErrorAlert from "../utils/types/error";
-import UsernameValidator from "../utils/validations/username";
-import EmailValidator from "../utils/validations/email";
-import PasswordValidator from "../utils/validations/password";
-import EqualValidator from "../utils/validations/equals";
+import { IoChatbubble } from "react-icons/io5"
+import { Link, useNavigate } from "react-router-dom"
+import Form, { FormAlert, FormButton, FormInput } from "../components/form"
+import { useState } from "react"
+import ErrorAlert from "../utils/types/error"
+import UsernameValidator from "../utils/validations/username"
+import EmailValidator from "../utils/validations/email"
+import PasswordValidator from "../utils/validations/password"
+import EqualValidator from "../utils/validations/equals"
+import userApi from "../api/restfull/user"
 
 export default function Register() {
-  const [inputs, setInputs] = useState<Record<string, string>>({})
+  const redirect = useNavigate()
+  const [inputs, setInputs] = useState<Record<string, string>>({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    avatar: ""
+  })
   const [errors, setErrors] = useState<Array<ErrorAlert>>([])
   
   function pushInput(key: string, value: string) {
@@ -103,6 +111,14 @@ export default function Register() {
                 type: "error",
                 message: "Senha inválida, tente outra!"
               })
+            EqualValidator.validate(e.target.value, inputs.confirmPassword)?
+            cleanError("confirmPassword")
+          :
+            pushError({
+              id: "confirmPassword",
+              type: "error",
+              message: "Senhas não coincidem!"
+            })
           }}
           incorrect={isIncorrect("password")}
           autoComplete="new-password"
@@ -124,12 +140,71 @@ export default function Register() {
           incorrect={isIncorrect("confirmPassword")}
           autoComplete="new-password"
         />
+        <div className="relative flex w-full">
+          <FormInput
+            label="URL da foto de perfil"
+            type="url"
+            onChange={(e) => {
+              pushInput("avatar", e.target.value)
+              e.target.value.length !== 0?
+                cleanError("avatar")
+              :
+                pushError({
+                  id: "avatar",
+                  type: "error",
+                  message: "URL inválida, tente outra!"
+                })
+            }}
+            incorrect={isIncorrect("avatar")}
+            autoComplete="photo"
+          />
+          {
+            inputs.avatar.length !== 0 && (
+              <img
+                onError={(e) => {
+                  e.currentTarget.src = "/logo.svg"
+                  pushError({
+                    id: "avatar",
+                    type: "error",
+                    message: "URL inválida, tente outra!"
+                  })
+                }}
+                className="absolute h-8 w-8 rounded-lg right-0 bottom-0"
+                src={inputs.avatar}
+                alt="avatar"
+              />
+            )
+          }
+        </div>
       </main>
       <footer className="flex flex-col text-center gap-5">
         {
           errors.find(e => e.type !== "success") && <FormAlert type={errors[0].type} description={errors[0].message} />
         }
-        <FormButton>Cadastrar</FormButton>
+        <FormButton
+          disabled={
+            errors.find(e => e.type !== "success" && e.type !== "warning") !== undefined ||
+            Object.values(inputs).some(v => v.length === 0)
+          }
+          onClick={async () => {
+            await userApi.register({
+              name: inputs.username,
+              email: inputs.email,
+              password: inputs.password,
+              avatar: "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+            }).then(() => {
+              redirect("/login")
+            }).catch(() => {
+              pushError({
+                id: "server",
+                type: "warning",
+                message: "Erro ao cadastrar, tente novamente!"
+              })
+            })
+          }}
+        >
+          Cadastrar
+        </FormButton>
         <Link to="/login">
           Já tenho uma conta,
           <span id="animated"> Entrar!</span>

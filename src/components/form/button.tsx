@@ -8,6 +8,8 @@ export default function Button({children, ...props}: ButtonProps) {
       className={`
         w-3/4 min-w-40 m-auto py-3 rounded-lg
         bg-black text-white
+        disabled:bg-slate-500 disabled:text-slate-200
+        transition-all duration-300
       `}
       {...props}
     >

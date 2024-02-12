@@ -1,12 +1,25 @@
-type TChannel = {
-  id: number
+import TMessage from "./message"
+import TUser from "./user"
+
+export type TDirect = {
+  isDirect: true
+}
+
+export type TGroup = {
   name: string
-  users: number[]
-} & ({
-isDirect: false,
-image: string
-} | {
-isDirect: true
-})
+  isDirect: false
+  image: string
+}
+
+type TChannel = {
+  id: string
+  members: TUser["id"][]
+} & (TDirect | TGroup)
+
+export type TChannelPopulate = {
+  id: string
+  members: Array<Omit<TUser, "email" | "password">>
+  messages: Array<TMessage>
+} & (TDirect | TGroup)
 
 export default TChannel

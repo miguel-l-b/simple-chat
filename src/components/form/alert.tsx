@@ -13,7 +13,7 @@ export default function Alert({type, description, ...props}: AlertProps) {
           className={`
             flex gap-5 items-center
             bg-red-100 border border-red-400 text-red-700
-            px-4 py-2 rounded-lg relative
+            px-4 py-2 rounded-lg
           `}
           role="alert"
           {...props}

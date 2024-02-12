@@ -1,5 +1,4 @@
-export interface ChatInputProps {
-  hidden?: boolean
+export interface ChatInputProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   message?: string
   className?: string
 }
@@ -14,9 +13,9 @@ export default function Input({ className, ...props }: ChatInputProps) {
       `}
       rows={2}
       placeholder="Digite sua mensagem..."
-      autoComplete="off"  
-      readOnly={props.hidden}
+      autoComplete="off" 
       value={props.message}
+      {...props}
     />
   )
 }

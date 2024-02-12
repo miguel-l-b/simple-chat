@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { FiAlertTriangle, FiCheckCircle, FiEye, FiEyeOff } from 'react-icons/fi'
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   label: string;
   incorrect?: boolean;
 }
@@ -9,7 +9,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 export default function Input({label, ...props}: InputProps) {
   const [type, setType] = useState(props.type)
   return (
-    <div className="flex flex-col text-center">
+    <div className="flex flex-col text-center w-full">
       <label className="mb-2 text-xl font-bold">{label}</label>
       <div className="relative flex h-8">
         <input

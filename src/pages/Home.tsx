@@ -35,41 +35,47 @@ export default function Home() {
       <Chat user_id="456" className="w-2/3 m-auto bg-slate-300 p-8 rounded-t-xl" content={[
         {
           id: "1",
+          channel_id: "1",
           type: "text",
           content: "Você tem algum compromisso amanhã? 🧐",
           author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
-          date: new Date("2024-02-07T18:46:00"),
+          createAt: new Date("2024-02-07T18:46:00"),
           read: false
-        },        {
+        },
+        {
           id: "1",
+          channel_id: "1",
           type: "text",
           content: "Também estou bem, obrigado por perguntar! ✌️",
           author: { id: "123", name: "Alice", avatar: "https://i.imgur.com/gSUHQQx.jpeg" },
-          date: new Date("2024-02-07T15:46:00"),
+          createAt: new Date("2024-02-07T15:46:00"),
           read: true
         },
         {
           id: "2",
+          channel_id: "1",
           type: "text",
           content: "Eaí mana!",
           author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
-          date: new Date("2024-02-07T15:44:34"),
+          createAt: new Date("2024-02-07T15:44:34"),
           read: true
         },
         {
           id: "2",
+          channel_id: "1",
           type: "text",
           content: "Estou bem, e você?",
           author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
-          date: new Date("2024-02-07T15:45:00"),
+          createAt: new Date("2024-02-07T15:45:00"),
           read: true
         },
         {
           id: "3",
+          channel_id: "1",
           type: "text",
           content: "Olá, como você está?",
           author: { id: "123", name: "Alice", avatar: "https://i.imgur.com/gSUHQQx.jpeg" },
-          date: new Date("2024-02-05T08:00:00"),
+          createAt: new Date("2024-02-05T08:00:00"),
           read: true
         },
       ]} />
@@ -79,7 +85,7 @@ export default function Home() {
           bg-slate-300 m-auto rounded-b-xl
         `}
       >
-        <ChatInput hidden message="topa ir na lanchonete amanhã?" />
+        <ChatInput readOnly message="topa ir na lanchonete amanhã?" />
         <ChatButton />
       </div>
     </section>
