@@ -19,7 +19,7 @@ export default function Home() {
       </nav>
     </Header>
     <main className="mt-12 text-center">
-      <h1>Olá 🖖</h1>
+      <h1>Olá, 🖖</h1>
       <br />
       <h2>Seja bem vindo ao SimpleChat</h2>
       <br />
@@ -31,7 +31,11 @@ export default function Home() {
         <Link to="/register"><span id="animated"> crie uma conta</span></Link>
       </p>
       <br />
-      <section id="exemple">
+      <br />
+      <br />
+      <section className="hidden md:block" id="exemple">
+      <h1 className="text-xl">Um exemplo do nosso sitema: </h1>
+      <br />
       <Chat user_id="456" className="w-2/3 m-auto bg-slate-300 p-8 rounded-t-xl" content={[
         {
           id: "1",
@@ -39,7 +43,7 @@ export default function Home() {
           type: "text",
           content: "Você tem algum compromisso amanhã? 🧐",
           author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
-          createAt: new Date("2024-02-07T18:46:00"),
+          createAt: new Date("2024-02-12T18:46:00"),
           read: false
         },
         {
@@ -48,7 +52,7 @@ export default function Home() {
           type: "text",
           content: "Também estou bem, obrigado por perguntar! ✌️",
           author: { id: "123", name: "Alice", avatar: "https://i.imgur.com/gSUHQQx.jpeg" },
-          createAt: new Date("2024-02-07T15:46:00"),
+          createAt: new Date("2024-02-12T15:46:00"),
           read: true
         },
         {
@@ -57,7 +61,7 @@ export default function Home() {
           type: "text",
           content: "Eaí mana!",
           author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
-          createAt: new Date("2024-02-07T15:44:34"),
+          createAt: new Date("2024-02-12T15:44:34"),
           read: true
         },
         {
@@ -66,7 +70,7 @@ export default function Home() {
           type: "text",
           content: "Estou bem, e você?",
           author: { id: "456", name: "Bob", avatar: "https://i.imgur.com/rzIaXzK.jpeg" },
-          createAt: new Date("2024-02-07T15:45:00"),
+          createAt: new Date("2024-02-11T15:45:00"),
           read: true
         },
         {
@@ -75,7 +79,7 @@ export default function Home() {
           type: "text",
           content: "Olá, como você está?",
           author: { id: "123", name: "Alice", avatar: "https://i.imgur.com/gSUHQQx.jpeg" },
-          createAt: new Date("2024-02-05T08:00:00"),
+          createAt: new Date("2024-02-11T08:00:00"),
           read: true
         },
       ]} />
@@ -90,24 +94,38 @@ export default function Home() {
       </div>
     </section>
     </main>
-    <section ref={refAbout} className="flex flex-col items-center justify-center text-center mt-56 w-full h-dvh bg-slate-300" id="about">
-      <h1 className="mb-20">Principais Recursos</h1>
-      <h2>Chat em Tempo Real</h2>
-      <p>Converse com amigos, familiares e colegas instantaneamente, sem atrasos.</p>
-      <p>Receba mensagens em tempo real, proporcionando uma experiência de comunicação rápida e eficaz.</p>
-      <br />
-      <h2>Sistema de Grupos</h2>
-      <p>Crie grupos temáticos para discutir tópicos específicos com pessoas interessadas.</p>
-      <p>Convide membros para seus grupos e mantenha conversas organizadas e focadas.</p>
-      <br />
-      <h2>Segurança e Privacidade</h2>
-      <p>Converse com segurança, sabendo que suas mensagens estão protegidas e privadas.</p>
-      <p>Mantemos seus dados pessoais seguros e protegidos.</p>
-      <br />
-      <h2>Como Funciona</h2>
-      <p>Crie uma conta ou faça login para começar a conversar.</p>
-      <p>Adicione amigos e comece a conversar com eles.</p>
-      <p>Crie grupos e convide membros para conversas temáticas.</p>
+    <section ref={refAbout} className="flex flex-wrap gap-y-8 gap-x-10 items-center justify-center text-center mt-56 py-15 p-20 w-full min-h-dvh bg-slate-300" id="about">
+      <h1 className="mb-20 basis-full">Principais Recursos</h1>
+      <div className="flex items-center rounded-3xl bg-green-200 w-[35rem] p-5">
+        <img className="w-40 rounded-3xl" src="https://i.imgur.com/LAMtcFH.jpeg" alt="exemplo" />
+        <div className="flex flex-col gap-2 w-full">
+          <p>Envie mensagens em tempo real</p>
+          <p>Conecte-se com seus amigos via DM</p>
+          <p>Crie grupos temáticos</p>
+        </div>
+      </div>
+      <div  className="flex items-center rounded-3xl bg-purple-200 w-[30rem] p-5">
+        <img className="bg-purple-400 w-40 rounded-3xl" src="https://i.imgur.com/XBAygBH.png" alt="" />
+        <div className="flex flex-col gap-2 w-full">
+          <p><Link to="/register"><span id="animated">Crie uma conta</span></Link> para começar</p>
+          <p>Adicione amigos</p>
+          <p>Crie grupos e convide membros</p>
+        </div>
+      </div>
+      <div className="flex items-center rounded-3xl bg-brown-200 w-[25rem] p-5">
+        <img className="w-40 rounded-3xl" src="https://i.imgur.com/ItZNGtd.jpeg" alt="" />
+        <div className="flex flex-col gap-2 w-full">
+          <p>Conheça pessoas</p>
+          <p>Busque e encontre a sua comunidade</p>
+        </div>
+      </div>
+      <div className="flex items-center rounded-3xl bg-blue-200 w-[25rem] p-5">
+        <img className="w-40 rounded-3xl" src="https://i.imgur.com/LWPk2lg.jpeg" alt="exemplo" />
+        <div className="flex flex-col gap-2 w-full">
+          <p>Converse com segurança!</p>
+          <p>Mantemos seus dados pessoais seguros e protegidos.</p>
+        </div>
+      </div>
     </section>
     </>
   )
