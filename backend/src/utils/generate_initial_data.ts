@@ -24,7 +24,7 @@ let playroom = Cache.set<TChannel>("channel", {
   id: generateUUID(),
   name: "sala de Jogos",
   isDirect: false,
-  image: "https://i.imgur.com/JAQbhEJ.png",
+  image: "https://i.imgur.com/tSfeEwt.jpeg",
   members: [
     tech.id,
     dev.id
