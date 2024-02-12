@@ -76,6 +76,34 @@ app.post("/channel/create", (req, res) => {
   res.json(channel)
 })
 
+app.delete("/channel/delete/:id", (req, res) => {
+  const token = req.headers.authorization
+
+  if(!validToken(token))
+  return res.status(401).json({ message: "Invalid token" })
+  const login_token = Cache.get<TLoginToken>("login_token", token)
+
+  const { id } = req.params
+  const channel = Cache.get<TChannel>("channel", id)
+
+  if(!channel)
+    return res.status(404).json({ message: "Channel not found" })
+
+  if(!channel.members.includes(login_token.user_id))
+    return res.status(403).json({ message: "You are not a member of this channel" })
+
+  Cache.delete("channel", id)
+
+  channel.members.forEach(member => {
+    const user = Cache.get<TUser>("user", member)
+    if(user.socket_id)
+      io.to(user.socket_id).emit("channel_deleted", { id })
+  })
+
+  res.json({ message: "Channel deleted" })
+})
+
+
 app.get("/users", (req, res) => {
   const { username } = req.query as { username: string }
   if(username !== undefined && typeof username !== "string")
