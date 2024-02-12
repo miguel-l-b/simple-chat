@@ -27,8 +27,28 @@ app.get("/", (req, res) => {
 
 app.get("/channels", (req, res) => {
   const { name } = req.query as { name: string }
-  const channels = Cache.getAll<TChannel>("channel").filter(channel => channel.isDirect === false && channel.name.toLowerCase().includes(name.toLowerCase()))
-  res.json(channels)
+  const channels = Cache.getAll<TChannel>("channel")
+    .filter(channel => channel.isDirect === false && channel.name.toLowerCase().includes(name.toLowerCase()))
+    .map(ch => ({
+      ...ch,
+      members: ch.members.map(member => {
+        const user = Cache.get<TUser>("user", member)
+        delete user.password
+        delete user.email
+        delete user.socket_id
+        return user
+      })
+    }))
+
+  const members = Cache.getAll<TUser>("user")
+    .filter(user => user.name.toLowerCase().includes(name.toLowerCase()))
+    .map(u => ({
+      id: u.id,
+      name: u.name,
+      image: u.avatar,
+      members: []
+    }))
+  res.json([...channels, ...members])
 })
 
 app.post("/channel/create", (req, res) => {
@@ -76,6 +96,68 @@ app.get("/users", (req, res) => {
   users.sort()
 
   res.json(users)
+})
+
+app.put("/user/update", (req, res) => {
+  const token = req.headers.authorization
+
+  if(!validToken(token))
+  return res.status(401).json({ message: "Invalid token" })
+  const login_token = Cache.get<TLoginToken>("login_token", token)
+
+  const updatedUser = req.body as Partial<TUser>
+  const user = Cache.update<TUser>("user", login_token.user_id, updatedUser)
+
+  delete user.password
+  delete user.socket_id
+
+  res.json(user)
+})
+
+app.put("/user/update/password", (req, res) => {
+  const token = req.headers.authorization
+
+  if(!validToken(token))
+  return res.status(401).json({ message: "Invalid token" })
+  const login_token = Cache.get<TLoginToken>("login_token", token)
+
+  const { password } = req.body as TUser
+  const user = Cache.update<TUser>("user", login_token.user_id, { password })
+
+  res.json({ message: "Password updated" })
+})
+
+app.delete("/user/delete", (req, res) => {
+  const token = req.headers.authorization
+
+  if(!validToken(token))
+  return res.status(401).json({ message: "Invalid token" })
+  const login_token = Cache.get<TLoginToken>("login_token", token)
+
+  Cache.delete("user", login_token.user_id)
+
+  res.json({ message: "User deleted" })
+})
+
+app.delete("/channel/delete/:id", (req, res) => {
+  const token = req.headers.authorization
+
+  if(!validToken(token))
+  return res.status(401).json({ message: "Invalid token" })
+  const login_token = Cache.get<TLoginToken>("login_token", token)
+
+  const { id } = req.params
+  const channel = Cache.get<TChannel>("channel", id)
+
+  if(!channel)
+    return res.status(404).json({ message: "Channel not found" })
+
+  if(!channel.members.includes(login_token.user_id))
+    return res.status(403).json({ message: "You are not a member of this channel" })
+
+  Cache.delete("channel", id)
+
+  res.json({ message: "Channel deleted" })
 })
 
 app.get("/user/channels", (req, res) => {
