@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react"
 import { IoCheckmarkDone  } from "react-icons/io5"
-import { FiTrash, FiCopy } from "react-icons/fi"
+import { FiCopy } from "react-icons/fi"
 import { BalloonSelectedContext } from "../../context/balloon_selected"
 import { ChatContext } from "../../context/chat"
 import { SocketConnection } from "../../api/socket/connection"
@@ -26,6 +26,7 @@ export default function Balloon({
     navigator.clipboard.writeText(
       `"${children!.toString()}" de ${author} - ${date.toLocaleTimeString().substring(0, 5)}`
     )
+    handleSelect("")
   }
 
   useEffect(() => {
