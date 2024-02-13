@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { FiSearch, FiUser } from "react-icons/fi"
+import { FiSearch, FiUser, FiX } from "react-icons/fi"
 import { MdGroupAdd } from "react-icons/md"
 import { IoMdPersonAdd } from "react-icons/io"
 
@@ -153,19 +153,43 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
       </button>
       {
         drawer && (
-          <Form className="absolute z-[999] flex flex-col items-center justify-center top-0 left-0 bg-slate-300 backdrop-blur-sm bg-opacity-50 w-full h-full py-48 px-56">
+          <div className="absolute z-[999] flex flex-col items-center justify-center top-0 left-0 bg-slate-300 backdrop-blur-sm bg-opacity-50 w-full h-full py-48 px-56">
+          <Form className="relative flex flex-col items-center w-2/4 gap-8 bg-white p-20 rounded-3xl">
+            <button onClick={() => {
+              setDrawer(false)
+              setNewChannel({
+                name: "",
+                image: "",
+                isDirect: false,
+                members: [user.id]
+              })
+            }} className="absolute top-10 left-10 text-red-500 text-xl">
+              <FiX />
+            </button>
             <Input
               label="Nome do Grupo"
               type="text"
               value={newChannel?.name}
               onChange={(e) => setNewChannel({ ...newChannel, name: e.target.value })}
             />
-            <Input
-              label="Imagem"
-              type="url"
-              value={newChannel?.image}
-              onChange={(e) => setNewChannel({ ...newChannel, image: e.target.value })}
-            />
+            <div className="relative w-full">
+              <Input
+                label="Imagem do Grupo"
+                type="text"
+                value={newChannel.image}
+                onChange={(e) => setNewChannel({ ...newChannel, image: e.target.value })}
+              />
+              {
+                newChannel.image.length !== 0 && (
+                  <img
+                    onError={(e) => e.currentTarget.src = "/logo.svg"}
+                    className="absolute h-8 w-8 rounded-lg right-0 bottom-0"
+                    src={newChannel.image}
+                    alt="avatar"
+                  />
+                )
+              }
+            </div>
             <Button 
               type="submit"
               onClick={() => {
@@ -183,6 +207,7 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
               Criar
             </Button>
           </Form>
+          </div>
         )
       }
     </main>
