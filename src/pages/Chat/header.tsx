@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { FiSearch, FiSettings, FiUser } from "react-icons/fi"
+import { FiSearch, FiUser } from "react-icons/fi"
+import { MdGroupAdd } from "react-icons/md"
 import { IoMdPersonAdd } from "react-icons/io"
 
 import CardChannel from "../../components/chat/card_channel"
@@ -8,15 +9,27 @@ import TUser from "../../utils/types/user"
 import { ChatContext } from "../../context/chat"
 import { TChannelSearch } from "../../utils/types/channel"
 import channelApi from "../../api/restfull/channel"
+import Form from "../../components/form"
+import Input from "../../components/form/input"
+import Button from "../../components/form/button"
+import { SocketConnection } from "../../api/socket/connection"
 
 export interface ChatHeaderProps {
   user: Omit<TUser, "email" | "password">
 }
 export default function ChatHeader({ user }: ChatHeaderProps) {
   const { channels } = useContext(ChatContext)
-  const [input, setInput] = useState("")
 
+  const [input, setInput] = useState("")
   const [search, setSearch] = useState<Array<TChannelSearch>>()
+  const [newChannel, setNewChannel] = useState({
+    name: "",
+    image: "",
+    isDirect: false,
+    members: [user.id]
+  })
+  const [drawer, setDrawer] = useState(false)
+
 
   useEffect(() => {
     setSearch(undefined)
@@ -26,6 +39,7 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
     <main
         className={`
           w-full lg:w-1/5 min-h-16 min-w-52
+          lg:h-full
           border-slate-400 border-b-2 lg:border-b-0 lg:border-r-2
           py-1.5 px-4
         `}
@@ -63,6 +77,11 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
             {
               search.map((channel, key) => (
                 <button 
+                  onClick={() => {
+                    SocketConnection.getConnection().emit("join_channel", {
+                      channel_id: channel.id
+                    })
+                  }}
                   key={channel.id}
                   className="flex items-center gap-2 py-3 px-2 transition-all duration-200 ease-in hover:bg-slate-400 hover:text-white rounded-xl w-fit lg:w-full"
                 >
@@ -104,11 +123,48 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
           </div>
         )
       }
-      <div className="flex lg:flex-col gap-2 justify-center overflow-x-auto lg:overflow-x-hidden">
+      <div className="flex lg:flex-col h-2/3 gap-2 justify-center overflow-y-hidden overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto">
         {
           channels.map((channel, key) => <CardChannel key={key} user={user} channel={channel} />)
         }
       </div>
+      <button onClick={() => setDrawer(!drawer)} className="hidden mt-auto mx-auto lg:block p-2 bg-slate-300 text-slate-700 text-3xl rounded-lg">
+        <MdGroupAdd />
+      </button>
+      {
+        drawer && (
+          <Form className="absolute z-[999] flex flex-col items-center justify-center top-0 left-0 bg-slate-300 backdrop-blur-sm bg-opacity-50 w-full h-full py-48 px-56">
+            <Input
+              label="Nome do Grupo"
+              type="text"
+              value={newChannel?.name}
+              onChange={(e) => setNewChannel({ ...newChannel, name: e.target.value })}
+            />
+            <Input
+              label="Imagem"
+              type="url"
+              value={newChannel?.image}
+              onChange={(e) => setNewChannel({ ...newChannel, image: e.target.value })}
+            />
+            <Button 
+              type="submit"
+              onClick={() => {
+                channelApi.create(newChannel).then((channel) => {
+                  setDrawer(false)
+                  setNewChannel({
+                    name: "",
+                    image: "",
+                    isDirect: false,
+                    members: [user.id]
+                  })
+                }).catch(console.log)
+              }}
+            >
+              Criar
+            </Button>
+          </Form>
+        )
+      }
     </main>
   )
 }

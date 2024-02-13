@@ -23,7 +23,7 @@ export default class Cache {
       ...this.cache,
       [key]: value
     }
-    this.log()
+    // this.log()
     return {
       id: key.split(":")[1],
       ...value
@@ -37,7 +37,7 @@ export default class Cache {
       ...this.cache[key],
       ...value
     }
-    this.log()
+    // this.log()
     return {
       id,
       ...this.cache[key]

@@ -13,6 +13,7 @@ export class SocketConnection {
     this.socket.on('connect', () => {
       console.log('Connected to server')
     })
+    return this.socket
   }
 
   static disconnect() {

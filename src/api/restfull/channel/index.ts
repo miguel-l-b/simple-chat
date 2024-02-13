@@ -1,7 +1,9 @@
+import CreateChannelAPI from "./create"
 import SearchChannelAPI from "./search"
 
 const channelApi = {
-  search: SearchChannelAPI
+  search: SearchChannelAPI,
+  create: CreateChannelAPI
 }
 
 export default channelApi

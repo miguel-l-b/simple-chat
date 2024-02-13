@@ -1,8 +1,9 @@
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { IoCheckmarkDone  } from "react-icons/io5"
 import { FiTrash, FiCopy } from "react-icons/fi"
 import { BalloonSelectedContext } from "../../context/balloon_selected"
 import { ChatContext } from "../../context/chat"
+import { SocketConnection } from "../../api/socket/connection"
 
 export interface ChatBallonProps {
   children: React.ReactNode;
@@ -27,6 +28,12 @@ export default function Balloon({
     )
   }
 
+  useEffect(() => {
+    if(!read && direction === "left") {
+      SocketConnection.getConnection().emit("read_message", { message_id: id })
+    }
+  }, [])
+
   return (
     <div className="relative w-full px-2.5 select-none" onDoubleClick={() => handleSelect(selectedId === id? "" : id)}>
       <div
@@ -39,7 +46,7 @@ export default function Balloon({
           ${selectedId !== id && "hidden"}
         `}
       >
-        <button
+        {/* <button
           className="flex flex-col group items-center mt-2 text-slate-600"
           type="button"
           onClick={() => deleteMessage(channel_id, id)}
@@ -51,7 +58,7 @@ export default function Balloon({
             `} 
             />
           <p>apagar</p>
-        </button>
+        </button> */}
         <button
           className="flex flex-col group items-center mt-2 text-slate-600"
           type="button"

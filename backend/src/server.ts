@@ -52,25 +52,35 @@ app.get("/channels", (req, res) => {
 })
 
 app.post("/channel/create", (req, res) => {
-  const channel = req.body as TChannel
+  const data = req.body as TChannel
 
-  channel.id = generateUUID()
+  data.id = generateUUID()
 
-  if(!channel.members || channel.members.length === 0)
+  if(!data.members || data.members.length === 0)
     return res.status(400).json({ message: "Channel must have at least one member" })
 
-  if(channel.isDirect && channel.members.length !== 2)
+  if(data.isDirect && data.members.length !== 2)
     return res.status(400).json({ message: "Direct channels must have exactly two members" })
 
-  if(!channel.isDirect && (!channel?.["name"] || !channel?.["image"]))
+  if(!data.isDirect && (!data?.["name"] || !data?.["image"]))
     return res.status(400).json({ message: "Group channels must have a name and an image" })
 
-  Cache.set<TChannel>("channel", channel)
+  const channel = Cache.set<TChannel>("channel", data)
 
   channel.members.forEach(member => {
     const user = Cache.get<TUser>("user", member)
     if(user.socket_id)
-      io.to(user.socket_id).emit("new_channel", Cache.get<TChannel>("channel", channel.id))
+      io.to(user.socket_id).emit("channel_joined", {
+        ...channel,
+        members: channel.members.map(member => {
+          const user = Cache.get<TUser>("user", member)
+          delete user.password
+          delete user.email
+          delete user.socket_id
+          return user
+        }),
+        messages: []
+      })
   })
 
   res.json(channel)
@@ -300,7 +310,7 @@ io.on("connection", (socket) => {
     if(!data || data.length === 0)
       return socket.emit("error", "Invalid data on join_channel")
 
-    const { channel_id } = JSON.parse(data)
+    const { channel_id } = data
     const oldChannel = Cache.get<TChannel>("channel", channel_id)
 
     Cache.update<TChannel>("channel", channel_id, {
@@ -309,23 +319,30 @@ io.on("connection", (socket) => {
 
     socket.emit("channel_joined", {
       ...oldChannel,
-      members: [...oldChannel.members, user.id]
+      members: [...oldChannel.members, user.id],
+      messages: Cache.getAll<TMessage>("message").filter(message => message.channel_id === channel_id).map(message => parseMessage(message))
     })
 
     Cache.get<TChannel>("channel", channel_id).members.forEach(member => {
       const user = Cache.get<TUser>("user", member)
-      if(user.socket_id)
+
+      if(user.socket_id) {
         io.to(user.socket_id).emit("member_joined", {
           id: channel_id,
-          member: user.id
+          member: {
+            id: user.id,
+            name: user.name,
+            avatar: user.avatar
+          }
         })
+      }
     })
   })
   socket.on("leave_channel", (data) => {
     if(!data || data.length === 0)
       return socket.emit("error", "Invalid data on leave_channel")
 
-    const { channel_id } = JSON.parse(data)
+    const { channel_id } = data
     const oldChannel = Cache.get<TChannel>("channel", channel_id)
 
     if(oldChannel.isDirect || oldChannel.members.length === 1) {
@@ -342,7 +359,7 @@ io.on("connection", (socket) => {
       members: oldChannel.members.filter(member => member !== user.id)
     })
 
-    socket.emit("channel_left", { channel_id })
+    socket.emit("channel_deleted", { id: channel_id })
 
     oldChannel.members.forEach(member => {
       const user = Cache.get<TUser>("user", member)
@@ -357,7 +374,7 @@ io.on("connection", (socket) => {
     if(!data || data.length === 0)
       return socket.emit("error", "Invalid data on read_message")
 
-    const { message_id } = JSON.parse(data)
+    const { message_id } = data
     let message = Cache.get<TMessage>("message", message_id)
 
     if(!message)
@@ -383,7 +400,13 @@ io.on("connection", (socket) => {
       ...data as Omit<TMessage, "author" | "createAt" | "read">
     })
 
-    io.to(message.channel_id).emit("new_message", parseMessage(message))
+    const channel = Cache.get<TChannel>("channel", message.channel_id)
+    channel.members.forEach(member => {
+      const user = Cache.get<TUser>("user", member)
+      console.log(`Sending message to: ${user.name}#${user.socket_id}`)
+      if(user.socket_id)
+        io.to(user.socket_id).emit("new_message", parseMessage(message))
+    })
   })
   socket.on("disconnect", () => {
     Cache.update<TUser>("user", user.id, { socket_id: null })
