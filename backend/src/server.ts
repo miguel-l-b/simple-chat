@@ -30,6 +30,7 @@ app.get("/channels", (req, res) => {
   const channels = Cache.getAll<TChannel>("channel")
     .filter(channel => channel.isDirect === false && channel.name.toLowerCase().includes(name.toLowerCase()))
     .map(ch => ({
+      isDirect: false,
       ...ch,
       members: ch.members.map(member => {
         const user = Cache.get<TUser>("user", member)
@@ -43,6 +44,7 @@ app.get("/channels", (req, res) => {
   const members = Cache.getAll<TUser>("user")
     .filter(user => user.name.toLowerCase().includes(name.toLowerCase()))
     .map(u => ({
+      isDirect: true,
       id: u.id,
       name: u.name,
       image: u.avatar,

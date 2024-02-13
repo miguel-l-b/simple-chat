@@ -17,6 +17,7 @@ type TChannel = {
 } & (TDirect | TGroup)
 
 export type TChannelSearch = {
+  isDirect: boolean
   id: string
   name: string
   image: string

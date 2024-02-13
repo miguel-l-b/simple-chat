@@ -78,9 +78,17 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
               search.map((channel, key) => (
                 <button 
                   onClick={() => {
-                    SocketConnection.getConnection().emit("join_channel", {
-                      channel_id: channel.id
-                    })
+                    if(channel.isDirect) {
+                      channelApi.create({
+                        isDirect: true,
+                        members: [user.id, channel.id]
+                      }).then()
+                        .catch()
+                    } else {
+                      SocketConnection.getConnection().emit("join_channel", {
+                        channel_id: channel.id
+                      })
+                    }
                   }}
                   key={channel.id}
                   className="flex items-center gap-2 py-3 px-2 transition-all duration-200 ease-in hover:bg-slate-400 hover:text-white rounded-xl w-fit lg:w-full"
