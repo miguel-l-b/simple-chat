@@ -38,8 +38,8 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
   return (
     <main
         className={`
+        flex flex-row lg:flex-col lg:justify-between
           w-full lg:w-1/5 min-h-16 min-w-52
-          lg:h-full
           border-slate-400 border-b-2 lg:border-b-0 lg:border-r-2
           py-1.5 px-4
         `}
@@ -65,7 +65,17 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
           onChange={(e) => setInput(e.target.value)}
         />
         <button onClick={() => {
-          channelApi.search(input).then(setSearch)
+          channelApi.search(input).then((e) => {
+            setSearch(
+              e.filter((ch: any) => {
+                if(!ch.isDirect) {
+                  if(channels.find((c) => c.id === ch.id)) return false
+                } else
+                  if(channels.find((c) => c.members.find(m => m.id === ch.id))) return false
+                return true
+              })
+            )
+          })
           .catch(console.log)
         }} className="flex h-7 w-7 items-center justify-center absolute right-0 top-0">
           <FiSearch className="text-slate-600 w-4 h-4" />
@@ -89,6 +99,8 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
                         channel_id: channel.id
                       })
                     }
+
+                    setSearch(undefined)
                   }}
                   key={channel.id}
                   className="flex items-center gap-2 py-3 px-2 transition-all duration-200 ease-in hover:bg-slate-400 hover:text-white rounded-xl w-fit lg:w-full"
@@ -131,7 +143,7 @@ export default function ChatHeader({ user }: ChatHeaderProps) {
           </div>
         )
       }
-      <div className="flex lg:flex-col h-2/3 gap-2 justify-center overflow-y-hidden overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto">
+      <div className="flex lg:flex-col gap-2 justify-center overflow-y-hidden overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto">
         {
           channels.map((channel, key) => <CardChannel key={key} user={user} channel={channel} />)
         }
