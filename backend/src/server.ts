@@ -16,7 +16,7 @@ import parseMessage from "./utils/parse_read"
 const app = express()
 const server = createServer(app)
 const io = new Server(server)
-const port = process.env.PORT || 3030
+const port = 3030
 
 app.use(express.json())
 app.use(cors())
