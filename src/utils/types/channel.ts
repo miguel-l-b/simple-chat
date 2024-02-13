@@ -16,6 +16,13 @@ type TChannel = {
   members: TUser["id"][]
 } & (TDirect | TGroup)
 
+export type TChannelSearch = {
+  id: string
+  name: string
+  image: string
+  members: Array<Omit<TUser, "email" | "password">>
+}
+
 export type TChannelPopulate = {
   id: string
   members: Array<Omit<TUser, "email" | "password">>

@@ -18,6 +18,7 @@ export default function ChatBox({user}: ChatBoxProps) {
   const { id: pageID } = useParams<{ id: string }>()
 
   const [input, setInput] = useState("")
+  const [isOpenDropdown, setIsOpenDropdown] = useState(false)
   const [currentChannel, setCurrentChannel] = useState<number>(-1)
   const { channels } = useContext(ChatContext)
 
@@ -25,9 +26,7 @@ export default function ChatBox({user}: ChatBoxProps) {
     const index = channels.findIndex(channel => channel.id === pageID)
     if(index > -1)
       setCurrentChannel(index)
-    else
-      redirect("/chat")
-  }, [channels, pageID, redirect])
+  }, [channels, pageID])
   
   function getName(channel: TChannelPopulate) {
     return channel.isDirect === true? channel.members.find(member => member.id !== user.id)!.name : channel.name
@@ -51,9 +50,30 @@ export default function ChatBox({user}: ChatBoxProps) {
               <h1 className="text-lg font-bold text-center">
                 {getName(channels[currentChannel])}
               </h1>
-            <button className="m-none ml-auto p-1">
-              <FiChevronDown className="w-6 h-6" />
-            </button>
+            <div className="relative m-none ml-auto">
+              <button
+                onClick={() => setIsOpenDropdown(!isOpenDropdown)}
+                className="p-1"
+              >
+                <FiChevronDown className="w-6 h-6" />
+              </button>
+              <div
+                className={`absolute top-10 right-0 bg-white w-40 rounded-lg shadow-lg ${isOpenDropdown? "block" : "hidden"}`}
+              >
+                <ul>
+                  <li>
+                    <button
+                      onClick={() => {
+
+                      }}
+                      className="w-full p-2 hover:bg-slate-200"
+                    >
+                      Sair
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </header>
           <ChatContextProvider>
             <Chat
@@ -75,9 +95,9 @@ export default function ChatBox({user}: ChatBoxProps) {
           </footer>
           </>
         ) : (
-          <h1 className="text-center text-3xl font-bold text-white mt-20">
-            Selecione um canal para começar a conversar
-          </h1>
+          <div className="flex items-center justify-center text-9xl font-bold text-slate-500 h-full">
+            <BsChatSquareDots />
+          </div>
         )
       }
     </footer>

@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import twemoji from 'twemoji'
 import Chat from './pages/Chat'
 import PopUp from './components/pop_up'
+import Profile from './pages/Chat/Profile'
 
 
 export default function Router() {
@@ -37,6 +38,7 @@ export default function Router() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/profile" element={<Profile />} />
           <Route path="/chat/:id" element={<Chat />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

@@ -2,7 +2,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   children: React.ReactNode;
 }
 
-export default function Button({children, ...props}: ButtonProps) {
+export default function Button({children, className, ...props}: ButtonProps) {
   return (
     <button
       className={`
@@ -10,6 +10,7 @@ export default function Button({children, ...props}: ButtonProps) {
         bg-black text-white
         disabled:bg-slate-500 disabled:text-slate-200
         transition-all duration-300
+        ${className}
       `}
       {...props}
     >

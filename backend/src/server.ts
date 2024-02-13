@@ -207,9 +207,18 @@ app.get("/user/channels", (req, res) => {
       messages: getMessages(channel),
       members: channel.members.map(member => {
         const user = Cache.get<TUser>("user", member)
-        delete user.password
-        delete user.email
-        delete user.socket_id
+        if(user) {
+          delete user.password
+          delete user.email
+          delete user.socket_id
+        } else {
+          return {
+            id: "0",
+            name: "Usuário Desconhecido",
+            avatar: "https://i.imgur.com/bsNR2uu.jpeg"
+          }
+        }
+
         return user
       })
     }
@@ -319,18 +328,29 @@ io.on("connection", (socket) => {
     const { channel_id } = JSON.parse(data)
     const oldChannel = Cache.get<TChannel>("channel", channel_id)
 
+    if(oldChannel.isDirect || oldChannel.members.length === 1) {
+      Cache.delete("channel", channel_id)
+      oldChannel.members.forEach(member => {
+        const user = Cache.get<TUser>("user", member)
+        if(user.socket_id)
+          io.to(user.socket_id).emit("channel_deleted", { id: channel_id })
+      })
+      return
+    }
+
     Cache.update<TChannel>("channel", channel_id, {
       members: oldChannel.members.filter(member => member !== user.id)
     })
 
-    socket.emit("channel_left", {
-      ...oldChannel,
-      members: oldChannel.members.filter(member => member !== user.id)
-    })
-    socket.leave(channel_id)
-    io.to(channel_id).emit("member_left", {
-      id: channel_id,
-      member: user.id
+    socket.emit("channel_left", { channel_id })
+
+    oldChannel.members.forEach(member => {
+      const user = Cache.get<TUser>("user", member)
+      if(user.socket_id)
+        io.to(user.socket_id).emit("member_left", {
+          id: channel_id,
+          member: user.id
+        })
     })
   })
   socket.on("read_message", (data) => {

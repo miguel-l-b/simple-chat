@@ -53,13 +53,6 @@ export default function ChatContextProvider({children}: {children: React.ReactNo
   }
 
   useEffect(() => {
-    SocketConnection.connect(token.token)
-    SocketConnection.getConnection().on("new_message", (message: TMessage) => {
-      console.log(message)
-      newMessage(message.channel_id, message)
-    })
-
-
     userApi.getChannels(token.token).then(channels => {
       channels.forEach(channel => {
         channel.messages.forEach(message => {
@@ -73,7 +66,7 @@ export default function ChatContextProvider({children}: {children: React.ReactNo
       localStorage.removeItem('user')
       window.location.href = "/login"
     })
-  }, [token, setChannels])
+  }, [])
 
   const deleteMessage = (channel_id: string, message_id: string) => {
     const newChannels = channels.map(channel => {
