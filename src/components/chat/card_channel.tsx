@@ -11,6 +11,11 @@ export default function CardChannel({
   user,
   channel
 }: CardChannelProps) {
+  function getLastMessage() {
+    if (channel.messages.length === 0) return "Nenhuma mensagem"
+    const msg = channel.messages[channel.messages.length - 1].content
+    return msg.length > 30? msg.slice(0, 30) + "..." : msg
+  }
   return (
     <Link
     key={channel.id}
@@ -26,6 +31,7 @@ export default function CardChannel({
       <h2 className="text-lg font-bold">
         {channel.isDirect? channel.members.find(member => member.id !== user.id)?.name : channel.name}
       </h2>
+      <p>{getLastMessage()}</p>
     </div>
   </Link>
   )
