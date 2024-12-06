@@ -1,5 +1,7 @@
+import ApiConsts from "../../../constants/ApiConsts"
+
 export default async function DeleteUserApi(token: string) {
-  return await fetch(`http://localhost:3030/user/delete`, {
+  return await fetch(`${ApiConsts.BASE_URL}/user/delete`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -7,7 +9,7 @@ export default async function DeleteUserApi(token: string) {
     }
   })
     .then(async (res) => {
-      if(!res.ok)
+      if (!res.ok)
         throw new Error("Error deleting user")
 
       await res.json() as { message: string }

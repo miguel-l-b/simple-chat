@@ -16,7 +16,7 @@ import parseMessage from "./utils/parse_read"
 const app = express()
 const server = createServer(app)
 const io = new Server(server)
-const port = 3030
+const port = process.env.PORT || 3000;
 
 app.use(express.json())
 app.use(cors())
@@ -58,20 +58,20 @@ app.post("/channel/create", (req, res) => {
 
   data.id = generateUUID()
 
-  if(!data.members || data.members.length === 0)
+  if (!data.members || data.members.length === 0)
     return res.status(400).json({ message: "Channel must have at least one member" })
 
-  if(data.isDirect && data.members.length !== 2)
+  if (data.isDirect && data.members.length !== 2)
     return res.status(400).json({ message: "Direct channels must have exactly two members" })
 
-  if(!data.isDirect && (!data?.["name"] || !data?.["image"]))
+  if (!data.isDirect && (!data?.["name"] || !data?.["image"]))
     return res.status(400).json({ message: "Group channels must have a name and an image" })
 
   const channel = Cache.set<TChannel>("channel", data)
 
   channel.members.forEach(member => {
     const user = Cache.get<TUser>("user", member)
-    if(user.socket_id)
+    if (user.socket_id)
       io.to(user.socket_id).emit("channel_joined", {
         ...channel,
         members: channel.members.map(member => {
@@ -91,24 +91,24 @@ app.post("/channel/create", (req, res) => {
 app.delete("/channel/delete/:id", (req, res) => {
   const token = req.headers.authorization
 
-  if(!validToken(token))
-  return res.status(401).json({ message: "Invalid token" })
+  if (!validToken(token))
+    return res.status(401).json({ message: "Invalid token" })
   const login_token = Cache.get<TLoginToken>("login_token", token)
 
   const { id } = req.params
   const channel = Cache.get<TChannel>("channel", id)
 
-  if(!channel)
+  if (!channel)
     return res.status(404).json({ message: "Channel not found" })
 
-  if(!channel.members.includes(login_token.user_id))
+  if (!channel.members.includes(login_token.user_id))
     return res.status(403).json({ message: "You are not a member of this channel" })
 
   Cache.delete("channel", id)
 
   channel.members.forEach(member => {
     const user = Cache.get<TUser>("user", member)
-    if(user.socket_id)
+    if (user.socket_id)
       io.to(user.socket_id).emit("channel_deleted", { id })
   })
 
@@ -118,7 +118,7 @@ app.delete("/channel/delete/:id", (req, res) => {
 
 app.get("/users", (req, res) => {
   const { username } = req.query as { username: string }
-  if(username !== undefined && typeof username !== "string")
+  if (username !== undefined && typeof username !== "string")
     return res.status(400).json({ message: "Invalid username" })
 
   const users = Cache.getAll<TUser>("user")
@@ -127,7 +127,7 @@ app.get("/users", (req, res) => {
       delete user.socket_id
       delete user.email
 
-      if(username && !user.name.toLowerCase().includes(username.toLowerCase()))
+      if (username && !user.name.toLowerCase().includes(username.toLowerCase()))
         return
 
       return user
@@ -141,8 +141,8 @@ app.get("/users", (req, res) => {
 app.put("/user/update", (req, res) => {
   const token = req.headers.authorization
 
-  if(!validToken(token))
-  return res.status(401).json({ message: "Invalid token" })
+  if (!validToken(token))
+    return res.status(401).json({ message: "Invalid token" })
   const login_token = Cache.get<TLoginToken>("login_token", token)
 
   const updatedUser = req.body as Partial<TUser>
@@ -157,8 +157,8 @@ app.put("/user/update", (req, res) => {
 app.put("/user/update/password", (req, res) => {
   const token = req.headers.authorization
 
-  if(!validToken(token))
-  return res.status(401).json({ message: "Invalid token" })
+  if (!validToken(token))
+    return res.status(401).json({ message: "Invalid token" })
   const login_token = Cache.get<TLoginToken>("login_token", token)
 
   const { password } = req.body as TUser
@@ -170,8 +170,8 @@ app.put("/user/update/password", (req, res) => {
 app.delete("/user/delete", (req, res) => {
   const token = req.headers.authorization
 
-  if(!validToken(token))
-  return res.status(401).json({ message: "Invalid token" })
+  if (!validToken(token))
+    return res.status(401).json({ message: "Invalid token" })
   const login_token = Cache.get<TLoginToken>("login_token", token)
 
   Cache.delete("user", login_token.user_id)
@@ -182,17 +182,17 @@ app.delete("/user/delete", (req, res) => {
 app.delete("/channel/delete/:id", (req, res) => {
   const token = req.headers.authorization
 
-  if(!validToken(token))
-  return res.status(401).json({ message: "Invalid token" })
+  if (!validToken(token))
+    return res.status(401).json({ message: "Invalid token" })
   const login_token = Cache.get<TLoginToken>("login_token", token)
 
   const { id } = req.params
   const channel = Cache.get<TChannel>("channel", id)
 
-  if(!channel)
+  if (!channel)
     return res.status(404).json({ message: "Channel not found" })
 
-  if(!channel.members.includes(login_token.user_id))
+  if (!channel.members.includes(login_token.user_id))
     return res.status(403).json({ message: "You are not a member of this channel" })
 
   Cache.delete("channel", id)
@@ -203,10 +203,10 @@ app.delete("/channel/delete/:id", (req, res) => {
 app.get("/user/channels", (req, res) => {
   const token = req.headers.authorization
 
-  if(!validToken(token))
+  if (!validToken(token))
     return res.status(401).json({ message: "Invalid token" })
   const user = Cache.get<TLoginToken>("login_token", token)
-  if(!user)
+  if (!user)
     return res.status(404).json({ message: "User not found" })
 
   const channels = Cache.getAll<TChannel>("channel").filter(channel => channel.members.includes(user.user_id))
@@ -219,7 +219,7 @@ app.get("/user/channels", (req, res) => {
       messages: getMessages(channel),
       members: channel.members.map(member => {
         const user = Cache.get<TUser>("user", member)
-        if(user) {
+        if (user) {
           delete user.password
           delete user.email
           delete user.socket_id
@@ -241,7 +241,7 @@ app.get("/user/channels", (req, res) => {
 app.get("/user/verify", (req, res) => {
   const token = req.headers.authorization
 
-  if(!validToken(token))
+  if (!validToken(token))
     return res.status(401).json({ message: "Invalid token" })
 
   res.status(200).json({ message: "Valid token" })
@@ -251,7 +251,7 @@ app.get("/user/:id", (req, res) => {
   const { id } = req.params
   const user = Cache.get<TUser>("user", id)
 
-  if(!user)
+  if (!user)
     return res.status(404).json({ message: "User not found" })
 
   delete user.email
@@ -264,7 +264,7 @@ app.get("/user/:id", (req, res) => {
 app.post("/user/login", (req, res) => {
   const { email, password } = req.body
   const user = Cache.getAll<TUser>("user").find(user => user.email === email && user.password === password)
-  if(!user)
+  if (!user)
     return res.status(404).json({ message: "User not found" })
 
   const { id, expiresIn } = Cache.set<TLoginToken>("login_token", {
@@ -302,14 +302,14 @@ io.on("connection", (socket) => {
 
   const login_token = Cache.getAll<TLoginToken>("login_token").find(user => user.id === socket.handshake.auth.token)
   const user = Cache.update<TUser>("user", login_token?.user_id, { socket_id: socket.id })
-  if(!user) {
+  if (!user) {
     socket.emit("error", "Invalid token")
     return socket.disconnect()
   }
   console.log(`New Connection: ${user.name}#${user.socket_id}`)
 
   socket.on("join_channel", (data) => {
-    if(!data || data.length === 0)
+    if (!data || data.length === 0)
       return socket.emit("error", "Invalid data on join_channel")
 
     const { channel_id } = data
@@ -328,7 +328,7 @@ io.on("connection", (socket) => {
     Cache.get<TChannel>("channel", channel_id).members.forEach(member => {
       const user = Cache.get<TUser>("user", member)
 
-      if(user.socket_id) {
+      if (user.socket_id) {
         io.to(user.socket_id).emit("member_joined", {
           id: channel_id,
           member: {
@@ -341,17 +341,17 @@ io.on("connection", (socket) => {
     })
   })
   socket.on("leave_channel", (data) => {
-    if(!data || data.length === 0)
+    if (!data || data.length === 0)
       return socket.emit("error", "Invalid data on leave_channel")
 
     const { channel_id } = data
     const oldChannel = Cache.get<TChannel>("channel", channel_id)
 
-    if(oldChannel.isDirect || oldChannel.members.length === 1) {
+    if (oldChannel.isDirect || oldChannel.members.length === 1) {
       Cache.delete("channel", channel_id)
       oldChannel.members.forEach(member => {
         const user = Cache.get<TUser>("user", member)
-        if(user.socket_id)
+        if (user.socket_id)
           io.to(user.socket_id).emit("channel_deleted", { id: channel_id })
       })
       return
@@ -365,7 +365,7 @@ io.on("connection", (socket) => {
 
     oldChannel.members.forEach(member => {
       const user = Cache.get<TUser>("user", member)
-      if(user.socket_id)
+      if (user.socket_id)
         io.to(user.socket_id).emit("member_left", {
           id: channel_id,
           member: user.id
@@ -373,13 +373,13 @@ io.on("connection", (socket) => {
     })
   })
   socket.on("read_message", (data) => {
-    if(!data || data.length === 0)
+    if (!data || data.length === 0)
       return socket.emit("error", "Invalid data on read_message")
 
     const { message_id } = data
     let message = Cache.get<TMessage>("message", message_id)
 
-    if(!message)
+    if (!message)
       return socket.emit("error", "Message not found")
 
     message = Cache.update<TMessage>("message", message_id, {
@@ -389,7 +389,7 @@ io.on("connection", (socket) => {
     socket.emit("update_message", parseMessage(message))
   })
   socket.on("send_message", (data) => {
-    if(!data || data.length === 0)
+    if (!data || data.length === 0)
       return socket.emit("error", "Invalid data on send_message")
 
     console.log("New message:", data)
@@ -406,7 +406,7 @@ io.on("connection", (socket) => {
     channel.members.forEach(member => {
       const user = Cache.get<TUser>("user", member)
       console.log(`Sending message to: ${user.name}#${user.socket_id}`)
-      if(user.socket_id)
+      if (user.socket_id)
         io.to(user.socket_id).emit("new_message", parseMessage(message))
     })
   })

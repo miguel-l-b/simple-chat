@@ -1,5 +1,7 @@
+import ApiConsts from "../../../constants/ApiConsts"
+
 export default async function CreateChannelAPI(channel: any) {
-  return await fetch("http://localhost:3030/channel/create", {
+  return await fetch(`${ApiConsts.BASE_URL}/channel/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
